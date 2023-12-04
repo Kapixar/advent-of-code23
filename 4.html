@@ -4,16 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Advent Of Code</title>
 </head>
 
 <body>
     <script type="module">
-        const fileUrl = '4.txt' // provide file location
-
-        const raw = await fetch(fileUrl)
-        const content = await raw.text()
-        const lines = content.split('\r\n')
+        const dayId = window.location.pathname.split("/").pop().split(".").shift();
+        const fileUrl = `txt/${dayId}.txt`
+        document.querySelector('title').textContent = `AoC - ${dayId}`
+        const rawFile = await fetch(fileUrl)
+        const fileContent = await rawFile.text()
+        const lines = fileContent.split('\r\n')
 
         // const sum = lines.reduce((acc, line) => {
         //     const [id, numbers] = line.split(':')
@@ -43,18 +44,15 @@
             const amountOfThisCard = cardsAmount[i]
 
             const [winning, my] = numbers.split('|')
-            console.log(winning, my);
+
             const winningNumbers = winning.trim().replace(/\s+/g, ' ').split(' ').map(n => parseInt(n))
             const myNumbers = my.trim().replace(/\s+/g, ' ').split(' ').map(n => parseInt(n))
-            console.log(winningNumbers, myNumbers);
             const matches = winningNumbers.filter(n => myNumbers.includes(n)).length
-            console.log(matches);
 
             for(let o = 1; o <= matches; o++) {
                 console.log(i + o, amountOfThisCard);
                 cardsAmount[i + o] += amountOfThisCard
             }
-            console.log(cardsAmount);
         }
 
         // sum of all cards

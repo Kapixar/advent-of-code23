@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script type="module">
+        const fileUrl = '4.txt' // provide file location
+
+        const raw = await fetch(fileUrl)
+        const content = await raw.text()
+        const lines = content.split('\r\n')
+
+        // const sum = lines.reduce((acc, line) => {
+        //     const [id, numbers] = line.split(':')
+        //     const [winning, my] = numbers.split('|')
+        //     console.log(winning, my);
+        //     const winningNumbers = winning.trim().replace(/\s+/g, ' ').split(' ').map(n => parseInt(n))
+        //     const myNumbers = my.trim().replace(/\s+/g, ' ').split(' ').map(n => parseInt(n))
+        //     console.log(winningNumbers, myNumbers);
+        //     const matches = winningNumbers.filter(n => myNumbers.includes(n)).length
+        //     console.log(matches);
+        //     if(matches === 0) return acc
+        //     if(matches === 1) return acc + 1
+        //     else return acc + 2**(matches-1)
+        // }, 0)
+
+        // console.log(sum);
+
+        const cardsAmount = {}
+        // fill with card ids
+        for (let i = 0; i < lines.length; i++) {
+            cardsAmount[i] = 1
+        }
+
+        for(let i = 0 ; i < lines.length; i++) {
+            const [idTxt, numbers] = lines[i].split(':')
+            const id = parseInt(idTxt) - 1
+            const amountOfThisCard = cardsAmount[i]
+
+            const [winning, my] = numbers.split('|')
+            console.log(winning, my);
+            const winningNumbers = winning.trim().replace(/\s+/g, ' ').split(' ').map(n => parseInt(n))
+            const myNumbers = my.trim().replace(/\s+/g, ' ').split(' ').map(n => parseInt(n))
+            console.log(winningNumbers, myNumbers);
+            const matches = winningNumbers.filter(n => myNumbers.includes(n)).length
+            console.log(matches);
+
+            for(let o = 1; o <= matches; o++) {
+                console.log(i + o, amountOfThisCard);
+                cardsAmount[i + o] += amountOfThisCard
+            }
+            console.log(cardsAmount);
+        }
+
+        // sum of all cards
+        const sum = Object.values(cardsAmount).reduce((acc, amount) => acc + amount, 0)
+        console.log(sum);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script type="module">
+        const redLimit = 12
+        const greenLimit = 13
+        const blueLimit = 14
+
+        const fileUrl = '2.txt' // provide file location
+
+        const raw = await fetch(fileUrl)
+        const content = await raw.text()
+        const lines = content.split('\r\n')
+
+
+        // 1
+
+        // const sum1 = lines.reduce((acc, line) => {
+        //     const [GameName, draws] = line.split(': ')
+
+        //     for(const draw of draws.split("; ")) {
+        //         const types =  draw.split(', ') //.map((numb) => parseInt(numb.split(' ')[1]))
+        //         console.log(types);
+        //         for(const type of types) {
+        //             const [numb, color] = type.split(' ')
+        //             console.log(color, numb);
+        //             switch(color) {
+        //                 case 'red':
+        //                     if(parseInt(numb) > redLimit) return acc
+        //                     break;
+        //                 case 'green':
+        //                     if(parseInt(numb) > greenLimit) return acc
+        //                     break;
+        //                 case 'blue':
+        //                     if(parseInt(numb) > blueLimit) return acc
+        //                     break;
+        //             }
+        //         }
+        //     }
+        //     console.log(parseInt(GameName.split(' ')[1]));
+        //     return acc + parseInt(GameName.split(' ')[1])
+        // }, 0)
+
+        // 2
+
+        const sum2 = lines.reduce((acc, line) => {
+            let redMin = 0;
+            let greenMin = 0;
+            let blueMin = 0;
+            // one game
+            const [GameName, draws] = line.split(': ')
+
+        
+
+            for(const draw of draws.split("; ")) { 
+                // one draw
+                const types =  draw.split(', ')
+                console.log(types);
+                for(const type of types) {
+                    const [numb, color] = type.split(' ')
+                    switch (color) {
+                        case 'red':
+                            redMin = Math.max(redMin, parseInt(numb))
+                            break;
+                        case 'green':
+                            greenMin = Math.max(greenMin, parseInt(numb))
+                            break;
+                        case 'blue':
+                            blueMin = Math.max(blueMin, parseInt(numb))
+                            break;
+                    }
+                    console.log(color, numb, window[color + 'Min']);
+                    window[color + 'Min'] = Math.max(window[color + 'Min'], parseInt(numb))
+                }
+            }
+            console.log(redMin, greenMin, blueMin);
+            return acc + (redMin * greenMin * blueMin)
+        }, 0)
+
+        console.log(sum2);
+    </script>
+</body>
+</html>

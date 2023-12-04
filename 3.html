@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script type="module">
+        const fileUrl = '3.txt' // provide file location
+
+        const raw = await fetch(fileUrl)
+        const content = await raw.text()
+        const lines = content.split('\r\n')
+
+        let symbols = {}
+        for (let y = 0; y < lines.length; y++) {
+            for (let x = 0; x < lines[y].length; x++) {
+                if (lines[y][x] === '*')
+                    symbols[`${x};${y}`] = [0, 1]
+            }
+        }
+        console.log(symbols);
+
+        
+        for (let y = 0; y < lines.length; y++) {
+            const regex1 = RegExp('\\d+', 'g');
+            let match;
+
+            while ((match = regex1.exec(lines[y])) !== null) {
+                const numb = parseInt(match[0])
+                console.log(`Found ${numb} at ${match.index} to ${regex1.lastIndex}.`);
+                for(let y2 = y - 1; y2 < y + 2; y2++) {
+                    for(let x2 = match.index - 1; x2 <= regex1.lastIndex; x2++) {
+                        console.log(`${x2};${y2}`);
+                        if(Object.keys(symbols).includes(`${x2};${y2}`)) {
+                            const [gearCount, gearRatio] = symbols[`${x2};${y2}`]
+                            symbols[`${x2};${y2}`] = [gearCount + 1, gearRatio * numb]
+                        }
+                    }
+                }
+            }
+        }
+        console.log(symbols);
+
+        const sum = Object.values(symbols).reduce((acc, [gearCount, gearRatio]) => {
+            console.log(gearCount, gearRatio);
+            return gearCount === 2 ? acc + gearRatio : acc
+        }, 0)
+
+        console.log(sum);
+    </script>
+</body>
+
+</html>

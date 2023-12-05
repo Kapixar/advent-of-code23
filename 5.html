@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advent Of Code</title>
+    <style> body { background-color: rgb(28, 28, 28); } </style>
+</head>
+
+<body>
+    <script type="module">
+        const dayId = window.location.pathname.split("/").pop().split(".").shift();
+        const fileUrl = `txt/${dayId}.txt`
+        document.querySelector('title').textContent = `AoC - ${dayId}`
+        const rawFile = await fetch(fileUrl)
+        const fileContent = await rawFile.text()
+        const lines = fileContent.split('\r\n')
+
+        const seeds = lines.shift().split(' ').map(Number).slice(1)
+        lines.shift()
+        // console.log(seeds);
+
+        let min = 99999999999999999999999999999
+
+        for(let i = 0; i < seeds.length; i += 2) {
+            const starting = seeds[i]
+            for(let s = 0; s < seeds[i + 1]; s++) {
+                const seed = starting + s
+                console.log(seed);
+                // console.log("Seed: ", seed);
+                let conections = [seed]
+                let lineID = 1
+                for(let step = 1; step < 8; step++) {
+                    // console.log("Next step: ", step);
+        
+                    while(lines[lineID] !== '' && lines[lineID] !== undefined) {
+                        const [to, from, range] = lines[lineID].split(' ').map(Number)
+                        // console.log(to, from, range);
+                        // console.log(from + range);
+                        const maxx = from + range
+                        if(conections[step - 1] < maxx && conections[step - 1] > from &&  conections[step] == undefined) {
+                            conections[step] = to + conections[step - 1] - from
+                        }
+                        lineID++
+                    }
+                    lineID += 2
+    
+                    if(!conections[step]) {
+                        conections.push(conections[step - 1])
+                    }
+                    // console.log(conections);
+    
+                }
+                // console.log(conections);
+                if(conections[conections.length - 1] < min) {
+                    min = conections[conections.length - 1]
+                }
+            }
+        } 
+
+
+        console.log(min);
+    </script>
+</body>
+
+</html>

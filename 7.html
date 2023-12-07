@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advent Of Code</title>
+    <style> body { background-color: rgb(28, 28, 28); } </style>
+</head>
+
+<body>
+    <script type="module">
+        const dayId = window.location.pathname.split("/").pop().split(".").shift();
+        const fileUrl = `txt/${dayId}.txt`
+        document.querySelector('title').textContent = `AoC - ${dayId}`
+        const rawFile = await fetch(fileUrl)
+        const fileContent = await rawFile.text()
+        const lines = fileContent.split('\r\n')
+
+        const order = ["A", "K", "Q", "T", "9", "8", "7", "6", "5", "4", "3", "2", "J"]
+        const types = {
+            "5": "5K", 
+            "14": "4K", 
+            "23": "FH", 
+            "113": "3K", 
+            "122": "2P", 
+            "1112": "1P",
+            "11111": "HC"
+        }
+        const typesOrder = ["5K", "4K", "FH", "3K", "2P", "1P", "HC"]
+
+        const handsAndBids = lines.map(line => {
+            return line.split(' ')
+        })
+
+        // const sortedHandsAndBids = handsAndBids.map(handBid => {
+        //     const hand = handBid[0]
+        //     console.log(hand);
+        //     return [hand.split('').toSorted((a, b) => {
+        //         return order.indexOf(a) - order.indexOf(b)
+        //     }).join(''), handBid[1]]
+        // })
+        // console.log(
+        //     sortedHandsAndBids
+        // );
+
+        const handsAndBidsAndRanks = handsAndBids.map(handBid => {
+            const hand = handBid[0]
+            const bid = handBid[1]
+            const type = getRankJoker(hand)
+            return [hand, Number(bid), type]
+        })
+
+        console.log(handsAndBidsAndRanks);
+
+        function getRank(str) {
+            const occurences = str.split('').reduce((acc, curr) => {
+                if (acc[curr]) {
+                    acc[curr]++
+                } else {
+                    acc[curr] = 1
+                }
+                return acc
+            }, {})
+            const occurencesValues = Object.values(occurences).sort((a, b) => a -b).join('')
+            console.log(occurencesValues, types[occurencesValues]);
+            return types[occurencesValues]
+        }
+
+        function getRankJoker(str) {
+            const occurences = str.split('').reduce((acc, curr) => {
+                if (acc[curr]) {
+                    acc[curr]++
+                } else {
+                    acc[curr] = 1
+                }
+                return acc
+            }, {})
+            const jokerAmount = occurences['J'] ? occurences['J'] : 0
+            delete occurences['J']
+            if(Object.keys(occurences).length === 0) {
+                return '5K'
+            }
+            const highest = Object.entries(occurences).sort((a, b) => a[1] - b[1]).pop()[0]
+            console.log(highest);
+            occurences[highest] += jokerAmount
+            const occurencesValues = Object.values(occurences).sort((a, b) => a - b).join('')
+            console.log(occurencesValues, types[occurencesValues]);
+            return types[occurencesValues]
+        }
+
+        const sortedHandsAndBidsAndRanks = handsAndBidsAndRanks.sort((a, b) => {
+            const typeA = typesOrder.indexOf(a[2])
+            const typeB = typesOrder.indexOf(b[2])
+            if (typeA === typeB) {
+                if(a[0][0] === b[0][0]) {
+                    if(a[0][1] === b[0][1]) {
+                        if(a[0][2] === b[0][2]) {
+                            if(a[0][3] === b[0][3]) {
+                                if(a[0][4] === b[0][4]) {
+                                    return 0
+                                }
+                                return order.indexOf(b[0][4]) - order.indexOf(a[0][4])
+                            }
+                            return order.indexOf(b[0][3]) - order.indexOf(a[0][3])
+                        }
+                        return order.indexOf(b[0][2]) - order.indexOf(a[0][2])
+                    }
+                    return order.indexOf(b[0][1]) - order.indexOf(a[0][1])
+                }
+                return order.indexOf(b[0][0]) - order.indexOf(a[0][0])
+            }
+            return typeB - typeA
+        })
+        console.log(sortedHandsAndBidsAndRanks);
+
+        let sum = 0
+        for(let i = 0; i < sortedHandsAndBidsAndRanks.length; i++) {
+            const bid = sortedHandsAndBidsAndRanks[i][1]
+            console.log(sortedHandsAndBidsAndRanks[i], bid, i+1, bid * (i + 1));
+            sum += bid * (i + 1)
+            
+        }
+        console.log(sum);
+        
+    </script>
+</body>
+
+</html>

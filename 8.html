@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advent Of Code</title>
+    <style> body { background-color: rgb(28, 28, 28); } </style>
+</head>
+
+<body>
+    <script type="module">
+        const dayId = window.location.pathname.split("/").pop().split(".").shift();
+        const fileUrl = `txt/${dayId}.txt`
+        document.querySelector('title').textContent = `AoC - ${dayId}`
+        const rawFile = await fetch(fileUrl)
+        const fileContent = await rawFile.text()
+        const lines = fileContent.split('\r\n')
+
+        const directions = lines.shift().split('').map(n => n === 'L' ? "0" : "1")
+        console.log(directions);
+        lines.shift()
+        
+        const first = 'AAA'
+        // const first = lines[0].split(' = ')[0]
+        const map = {}
+        for(const line of lines) {
+            const [key, values] = line.split(' = ')
+            map[key] = values.slice(1, values.length - 1).split(', ')
+        }
+        console.log(map);
+        let steps = 0
+
+        let current = first
+        while(current != 'ZZZ') {
+            current = map[current][directions[steps % directions.length]]
+            steps++;
+        }
+        console.log(steps);
+    </script>
+</body>
+
+</html>

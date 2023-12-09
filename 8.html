@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advent Of Code</title>
-    <style> body { background-color: rgb(28, 28, 28); } </style>
+    <style>
+        body {
+            background-color: rgb(28, 28, 28);
+        }
+    </style>
 </head>
 
 <body>
@@ -17,26 +21,58 @@
         const fileContent = await rawFile.text()
         const lines = fileContent.split('\r\n')
 
-        const directions = lines.shift().split('').map(n => n === 'L' ? "0" : "1")
+        const directions = lines.shift().split('').map(n => n === 'L' ? 0 : 1)
         console.log(directions);
         lines.shift()
-        
-        const first = 'AAA'
-        // const first = lines[0].split(' = ')[0]
+
         const map = {}
-        for(const line of lines) {
+        for (const line of lines) {
             const [key, values] = line.split(' = ')
             map[key] = values.slice(1, values.length - 1).split(', ')
         }
+        const nodes = Object.keys(map).filter(key => key[2] === 'A')
+        console.log(nodes);
         console.log(map);
-        let steps = 0
 
-        let current = first
-        while(current != 'ZZZ') {
-            current = map[current][directions[steps % directions.length]]
-            steps++;
+        // console.log(!nodes.every(nude => nude[2] === 'Z'));
+        // while(!nodes.every(nude => nude[2] === 'Z')) {
+        //     const e = steps % directions.length
+        //     for(let i = 0; i < nodes.length; i++)
+        //         nodes[i] = map[nodes[i]][directions[e]]
+        //     steps++;
+        // }
+        const stepsArray = []
+        for (let i = 0; i < nodes.length; i++) {
+            let steps = 0
+            while (nodes[i][2] !== 'Z') {
+                const e = steps % directions.length
+                nodes[i] = map[nodes[i]][directions[e]]
+                steps++;
+            }
+            console.log(steps);
+            stepsArray.push(steps)
         }
-        console.log(steps);
+        let nwww = stepsArray[0];
+        for (let i = 1; i < stepsArray.length; i++) {
+            nwww = nww(nwww, stepsArray[i])
+        }
+        console.log(nwww);
+
+        function nwd(a, b) {
+            var reszta;
+            while (b) {
+                reszta = a % b;
+                a = b;
+                b = reszta;
+            }
+            return a;
+        }
+
+        //--------- FUNKCJA NWW ----------
+        function nww(a, b) {
+            return a * b / nwd(a, b);
+        }
+
     </script>
 </body>
 

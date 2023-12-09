@@ -30,13 +30,13 @@
             }
             console.log(ladder);
 
-            ladder[ladder.length - 1].push(0)
+            ladder[ladder.length - 1].unshift(0)
             for(let i = ladder.length - 2; i >= 0; i--) {
-                ladder[i].push(ladder[i][ladder[i].length - 1] + ladder[i + 1][ladder[i + 1].length - 1]) 
+                ladder[i].unshift(ladder[i][0] - ladder[i + 1][0]) 
             }
             console.log(ladder);
 
-            return acc + ladder[0][ladder[0].length - 1]
+            return acc + ladder[0][0]
         }, 0)
 
         console.log(sum);

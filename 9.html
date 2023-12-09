@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advent Of Code</title>
+    <style> body { background-color: rgb(28, 28, 28); } </style>
+</head>
+
+<body>
+    <script type="module">
+        const dayId = window.location.pathname.split("/").pop().split(".").shift();
+        const fileUrl = `txt/${dayId}.txt`
+        document.querySelector('title').textContent = `AoC - ${dayId}`
+        const rawFile = await fetch(fileUrl)
+        const fileContent = await rawFile.text()
+        const lines = fileContent.split('\r\n')
+        
+        const sum = lines.reduce((acc, line) => {
+            const ladder = [line.split(' ').map(Number)]
+            let currentLine = ladder.length - 1
+            while(!ladder[currentLine].every((v) => v === 0)) {
+                const newLine = []
+                for(let i = 0; i < ladder[currentLine].length - 1; i++) {
+                    newLine.push(ladder[currentLine][i + 1] - ladder[currentLine][i])
+                }
+                ladder.push(newLine)
+                currentLine = ladder.length - 1
+            }
+            console.log(ladder);
+
+            ladder[ladder.length - 1].push(0)
+            for(let i = ladder.length - 2; i >= 0; i--) {
+                ladder[i].push(ladder[i][ladder[i].length - 1] + ladder[i + 1][ladder[i + 1].length - 1]) 
+            }
+            console.log(ladder);
+
+            return acc + ladder[0][ladder[0].length - 1]
+        }, 0)
+
+        console.log(sum);
+        
+    </script>
+</body>
+
+</html>

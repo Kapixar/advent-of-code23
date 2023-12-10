@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advent Of Code</title>
+    <style> body { background-color: rgb(28, 28, 28); } </style>
+</head>
+
+<body>
+    <script type="module">
+        const dayId = window.location.pathname.split("/").pop().split(".").shift();
+        const fileUrl = `txt/${dayId}.txt`
+        document.querySelector('title').textContent = `AoC - ${dayId}`
+        const rawFile = await fetch(fileUrl)
+        const fileContent = await rawFile.text()
+        const lines = fileContent.split('\r\n')
+
+        const canvas = document.createElement('canvas')
+        canvas.width = 1430
+        canvas.height = 1400
+        document.body.appendChild(canvas)
+        const ctx = canvas.getContext('2d')
+        ctx.fillStyle = 'white'
+        ctx.font = '18px monospace'
+        
+        const sPos = { x: 0, y: 0 }
+        for(let i = 0; i < lines.length; i++) {
+            const line = lines[i]
+            const x = line.indexOf('S')
+            if(x > -1) {
+                sPos.x = x
+                sPos.y = i
+                break
+            }
+        }
+        console.log(sPos);
+
+        const currentPos = { x: sPos.x, y: sPos.y + 1, from: "N" }
+
+        
+        const pipeTypes = {
+            "|": ["N", "S"],
+            "-": ["W", "E"],
+            "L": ["N", "E"],
+            "J": ["N", "W"],
+            "7": ["S", "W"],
+            "F": ["S", "E"]
+        }
+
+        const pipeAscii = {
+            "|": "│",
+            "-": "─",
+            "L": "└",
+            "J": "┘",
+            "7": "┐",
+            "F": "┌"
+        }
+
+        const directions = {
+            "N": { x: 0, y: -1 },
+            "E": { x: 1, y: 0 },
+            "W": { x: -1, y: 0 },
+            "S": { x: 0, y: 1 },
+        }
+
+        const directionsReverse = {
+            "N": "S",
+            "E": "W",
+            "W": "E",
+            "S": "N",
+        }
+
+        let steps = 0
+        while(lines[currentPos.y][currentPos.x] !== "S" && steps < 100000) {
+            console.log('finding new ');
+            console.log(lines[currentPos.y][currentPos.x]);
+            console.log(currentPos);
+            ctx.fillStyle = 'white'
+            ctx.fillRect(currentPos.x * 10 + 10, currentPos.y * 10, 10, 10)
+            ctx.fillStyle = 'red'
+            ctx.fillText(pipeAscii[lines[currentPos.y][currentPos.x]], currentPos.x * 10 + 10, currentPos.y * 10 + 10)
+            const dir = pipeTypes[lines[currentPos.y][currentPos.x]].find(d => d !== currentPos.from)
+            currentPos.x = currentPos.x + directions[dir].x, 
+            currentPos.y = currentPos.y + directions[dir].y,
+            currentPos.from = directionsReverse[dir]
+            console.log(currentPos);
+            steps++
+        }
+        
+        console.log("we have a loop");
+        console.log(lines[currentPos.y][currentPos.x], steps/2);
+
+        // for(let c = -1; c < 2; c++) {
+        //     for(let r = -1; r < 2; r++) {
+        //         if((c === 1 && r === 1) || (currentPos.x - c === prevPos.x || currentPos.y - r === prevPos.y)) continue
+                
+        //     }
+        // }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advent Of Code</title>
+    <style> body { background-color: rgb(28, 28, 28); } </style>
+</head>
+
+<body>
+    <script type="module">
+        const dayId = window.location.pathname.split("/").pop().split(".").shift();
+        const fileUrl = `txt/${dayId}.txt`
+        document.querySelector('title').textContent = `AoC - ${dayId}`
+        const rawFile = await fetch(fileUrl)
+        const fileContent = await rawFile.text()
+        let lines = fileContent.split('\r\n')
+        for(let i = 0; i < lines.length; i++) {
+            lines[i] = lines[i].split('')
+        }
+
+        // checking the columns
+        const emptyColumns = []
+        let x = 0
+        while(x < lines[0].length) {
+            let isEmpty = true
+            for(let y = 0; y < lines.length; y++) {
+                if(lines[y][x] !== '.') {
+                    isEmpty = false
+                    break
+                }
+            }
+            if(isEmpty) {
+                emptyColumns.push(x)
+                // for(let y = 0; y < lines.length; y++) {
+                //     lines[y].splice(x, 0, '.')  
+                // }
+                // x += 2;  
+            }
+            x++
+        }
+
+        // expanding rows
+        let y = 0
+        const emptyRows = []
+        while(y < lines.length) {
+            let isEmpty = true
+            for(let x = 0; x < lines[0].length; x++) {
+                if(lines[y][x] !== '.') {
+                    isEmpty = false
+                    break
+                }
+            }
+            if(isEmpty) {
+                emptyRows.push(y)
+                // lines.splice(y, 0, Array(lines[0].length).fill('.'))
+                // y += 2;  
+            }
+            y++
+        }
+
+        console.log(lines);
+
+        const galaxyArr = []
+        for(let y = 0; y < lines.length; y++) {
+            for(let x = 0; x < lines[0].length; x++) {
+                if(lines[y][x] !== '.') {
+                    galaxyArr.push(x + ',' + y)
+                }
+            }
+        }
+        console.log(galaxyArr);
+
+        let saver = 0
+        let sum = 0
+        const numberOfPairs = galaxyArr.length * (galaxyArr.length - 1) / 2
+        const pairArr = []
+        let currentId = 0
+        while(pairArr.length < numberOfPairs && saver < 200000) {
+            for(let i = currentId + 1; i < galaxyArr.length; i++) {
+
+                const pairId = galaxyArr[currentId] + '|' + galaxyArr[i]
+                if(pairArr.includes(pairId)) continue      
+                pairArr.push(pairId)
+                // console.log(pairId);
+                sum += getDistance(galaxyArr[currentId], galaxyArr[i])
+            }
+            currentId++
+            saver++
+        }
+
+        console.log(sum);
+
+        console.log(emptyColumns);
+        console.log(emptyRows);
+
+        function getDistance(pair1, pair2) {
+            const pair1Arr = pair1.split(',')
+            const pair2Arr = pair2.split(',')
+            let x1 = parseInt(pair1Arr[0])
+            let y1 = parseInt(pair1Arr[1])
+            let x2 = parseInt(pair2Arr[0])
+            let y2 = parseInt(pair2Arr[1])
+            let smallerX = Math.min(x1, x2)
+            let smallerY = Math.min(y1, y2)
+            let biggerX = Math.max(x1, x2)
+            let biggerY = Math.max(y1, y2)
+
+            for(const emptyColumn of emptyColumns) {
+                if(emptyColumn > smallerX && emptyColumn < biggerX) {
+                    smallerX -= 999999
+                }
+            }
+            for(const emptyRow of emptyRows) {
+                if(emptyRow > smallerY && emptyRow < biggerY) {
+                    smallerY -= 999999
+                    // console.log('y');
+                }
+            }
+            return Math.abs(smallerX - biggerX) + Math.abs(smallerY - biggerY)
+        }
+        
+    </script>
+</body>
+
+</html>

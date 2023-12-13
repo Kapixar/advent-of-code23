@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advent Of Code</title>
+    <style> body { background-color: rgb(28, 28, 28); } </style>
+</head>
+
+<body>
+    <script type="module">
+        const dayId = window.location.pathname.split("/").pop().split(".").shift();
+        const fileUrl = `txt/${dayId}.txt`
+        document.querySelector('title').textContent = `AoC - ${dayId}`
+        const rawFile = await fetch(fileUrl)
+        const fileContent = await rawFile.text()
+        const lines = fileContent.split('\r\n')
+        
+        // split lines into chunks betwwen each enty that is a blank line
+        const chunks = []
+        let chunk = []
+        for(let i = 0; i < lines.length; i++) {
+            if(lines[i] === '') {
+                chunks.push(chunk)
+                chunk = []
+            }
+            else {
+                chunk.push(lines[i])
+            }
+        }
+
+
+        const sum = chunks.reduce((acc, chunk) => {
+            console.log('-----------------------------');
+            // checking for horizontal symetry
+            
+            const transposedChunk = transposeChunk(chunk)
+            console.log(transposedChunk);
+            console.log(chunk);
+
+            const verticalSymetryPoint = findSymetryPoint(transposedChunk, 1)
+            if(verticalSymetryPoint !== null) {
+                console.log('vert ', verticalSymetryPoint);
+                return acc + verticalSymetryPoint
+            } else {
+                const horizontalSymetryPoint = findSymetryPoint(chunk, 1)
+                console.log('horiz', horizontalSymetryPoint * 100);
+                return acc + horizontalSymetryPoint * 100
+            }
+            return acc
+        }, 0)
+
+        function findSymetryPoint(chunk, maxDiff = 1) {
+            let symetryPoint = null
+            console.log('xcdf');
+
+            for(let i = 0; i < chunk.length - 1; i++) {
+                let diff = findDifferencesBetweenStrings(chunk[i], chunk[i + 1])
+                if(diff < 2) {
+                    let isSymetric = true
+                    // console.log('Symetric at ', i + "?");
+                    for(let j = 1; j <= chunk[i].length; j++) {
+                        if(chunk[i + j + 1] === undefined || chunk[i - j] === undefined)
+                            break
+                        // console.log(chunk[i + j + 1], chunk[i - j]);
+                        let innerDiff = findDifferencesBetweenStrings(chunk[i + j + 1], chunk[i - j])
+                        console.log(chunk[i + j + 1], chunk[i - j], innerDiff);
+                        if(innerDiff > 0){
+                            diff += innerDiff
+                        }
+                        if(diff > maxDiff){
+                            isSymetric = false
+                            break
+                        }
+                    }
+                    console.log(isSymetric, diff, i + 1);
+                    if(isSymetric && diff == maxDiff) {
+                        symetryPoint = i + 1
+                        break
+                    }
+                }
+            }
+            return symetryPoint
+        }
+
+        function transposeChunk(chunk) {
+            const transposedChunk = []
+            for(let i = 0; i < chunk[0].length; i++) {
+                transposedChunk.push([])
+            }
+            for(let i = 0; i < chunk.length; i++) {
+                for(let j = 0; j < chunk[0].length; j++) {
+                    transposedChunk[j].push(chunk[i][j])
+                }
+            }
+            for(let j = 0; j < chunk[0].length; j++) {
+                transposedChunk[j] = transposedChunk[j].join('')
+            }
+            return transposedChunk
+        }
+        
+        function findDifferencesBetweenStrings(s1, s2) {
+            let differences = 0
+            for(let i = 0; i < s1.length; i++) {
+                if(s1[i] !== s2[i]) {
+                    differences++
+                }
+            }
+            return differences
+        }
+
+        console.log(sum); // 1: 35538, 2: 30442   30439
+
+    </script>
+</body>
+
+</html>

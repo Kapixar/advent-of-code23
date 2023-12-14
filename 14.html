@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advent Of Code</title>
-    <style> body { background-color: rgb(28, 28, 28); } </style>
+    <style>
+        body {
+            background-color: rgb(28, 28, 28);
+        }
+    </style>
 </head>
 
 <body>
@@ -17,9 +21,112 @@
         const fileContent = await rawFile.text()
         const lines = fileContent.split('\r\n')
 
-        
+        // string to array
+        for (let i = 0; i < lines.length; i++) {
+            lines[i] = lines[i].split('')
+        }
 
-        console.log(sum);
+        for(let i = 0; i < 5000000; i++) {
+            rollNorth()
+            rollWest()
+            rollSouth()
+            rollEast()
+        }
+
+        console.log(calculateSum());
+
+        function calculateSum() {
+            let sum = 0
+            for (let x = 0; x < lines[0].length; x++) {
+                let columnSum = 0
+                for (let y = 0; y < lines.length; y++) {
+                    if (lines[y][x] === 'O')
+                        columnSum += lines.length - y
+                }
+                sum += columnSum
+            }
+            return sum
+        }
+
+        function rollNorth() {
+            for (let x = 0; x < lines[0].length; x++) {
+                let lastEmpty = 0
+                for (let y = 0; y < lines.length; y++) {
+                    switch (lines[y][x]) {
+                        case 'O':
+                            if (lastEmpty !== y) {
+                                lines[y][x] = ' '
+                                lines[lastEmpty][x] = 'O'
+                            }
+                            lastEmpty = lastEmpty + 1
+                            break;
+                        case '#':
+                            lastEmpty = y + 1
+                            break;
+                    }
+                }
+            }
+        }
+
+        function rollSouth() {
+            for (let x = 0; x < lines[0].length; x++) {
+                let lastEmpty = lines.length - 1
+                for (let y = lines.length - 1; y >= 0; y--) {
+                    switch (lines[y][x]) {
+                        case 'O':
+                            if (lastEmpty !== y) {
+                                lines[y][x] = ' '
+                                lines[lastEmpty][x] = 'O'
+                            }
+                            lastEmpty = lastEmpty - 1
+                            break;
+                        case '#':
+                            lastEmpty = y - 1
+                            break;
+                    }
+                }
+            }
+        }
+
+        function rollWest() {
+            for (let y = 0; y < lines.length; y++) {
+                let lastEmpty = 0
+                for (let x = 0; x < lines[0].length; x++) {
+                    switch (lines[y][x]) {
+                        case 'O':
+                            if (lastEmpty !== x) {
+                                lines[y][x] = ' '
+                                lines[y][lastEmpty] = 'O'
+                            }
+                            lastEmpty = lastEmpty + 1
+                            break;
+                        case '#':
+                            lastEmpty = x + 1
+                            break;
+                    }
+                }
+            }
+        }
+
+        function rollEast() {
+            for (let y = 0; y < lines.length; y++) {
+                let lastEmpty = lines[0].length - 1
+                for (let x = lines[0].length - 1; x >= 0; x--) {
+                    switch (lines[y][x]) {
+                        case 'O':
+                            if (lastEmpty !== x) {
+                                lines[y][x] = ' '
+                                lines[y][lastEmpty] = 'O'
+                            }
+                            lastEmpty = lastEmpty - 1
+                            break;
+                        case '#':
+                            lastEmpty = x - 1
+                            break;
+                    }
+                }
+            }
+        }
     </script>
 </body>
 

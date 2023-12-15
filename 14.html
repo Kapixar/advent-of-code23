@@ -24,23 +24,64 @@
         // string to array
         for (let i = 0; i < lines.length; i++) {
             lines[i] = lines[i].split('')
+            // turn 0 to true, # to false, and . to null
+            for (let j = 0; j < lines[i].length; j++) {
+                switch (lines[i][j]) {
+                    case 'O':
+                        lines[i][j] = true
+                        break;
+                    case '.':
+                        lines[i][j] = null
+                        break;
+                    case '#':
+                        lines[i][j] = false
+                        break;
+                }
+            }
         }
+        let history = []
 
-        for(let i = 0; i < 5000000; i++) {
+        const linesCopy = JSON.parse(JSON.stringify(lines))
+        history.push(linesCopy);
+
+        // console.log(linesCopy);
+        for(let i = 0; i < 1700; i++) {
             rollNorth()
             rollWest()
             rollSouth()
             rollEast()
+            const str = stringify2DArray(lines)
+            if(history.includes(str)) {
+                console.log('found');
+                console.log(history.indexOf(str), i);
+                console.log(calculateSum());
+                // console.log(i)
+            
+            }
+            history.push(str)
         }
 
-        console.log(calculateSum());
+        // we were looking for pattern from 142 cycle
+
+
+
+        function stringify2DArray(a) {
+            let string = ''
+            for (let i = 0; i < a.length; i++) {
+                for (let j = 0; j < a[i].length; j++) {
+                    string += a[i][j] + ' '
+                }
+                string += '\n'
+            }
+            return string
+        }
 
         function calculateSum() {
             let sum = 0
             for (let x = 0; x < lines[0].length; x++) {
                 let columnSum = 0
                 for (let y = 0; y < lines.length; y++) {
-                    if (lines[y][x] === 'O')
+                    if (lines[y][x] === true)
                         columnSum += lines.length - y
                 }
                 sum += columnSum
@@ -53,14 +94,14 @@
                 let lastEmpty = 0
                 for (let y = 0; y < lines.length; y++) {
                     switch (lines[y][x]) {
-                        case 'O':
+                        case true:
                             if (lastEmpty !== y) {
-                                lines[y][x] = ' '
-                                lines[lastEmpty][x] = 'O'
+                                lines[y][x] = null
+                                lines[lastEmpty][x] = true
                             }
                             lastEmpty = lastEmpty + 1
                             break;
-                        case '#':
+                        case false:
                             lastEmpty = y + 1
                             break;
                     }
@@ -73,14 +114,14 @@
                 let lastEmpty = lines.length - 1
                 for (let y = lines.length - 1; y >= 0; y--) {
                     switch (lines[y][x]) {
-                        case 'O':
+                        case true:
                             if (lastEmpty !== y) {
-                                lines[y][x] = ' '
-                                lines[lastEmpty][x] = 'O'
+                                lines[y][x] = null
+                                lines[lastEmpty][x] = true
                             }
                             lastEmpty = lastEmpty - 1
                             break;
-                        case '#':
+                        case false:
                             lastEmpty = y - 1
                             break;
                     }
@@ -93,14 +134,14 @@
                 let lastEmpty = 0
                 for (let x = 0; x < lines[0].length; x++) {
                     switch (lines[y][x]) {
-                        case 'O':
+                        case true:
                             if (lastEmpty !== x) {
-                                lines[y][x] = ' '
-                                lines[y][lastEmpty] = 'O'
+                                lines[y][x] = null
+                                lines[y][lastEmpty] = true
                             }
                             lastEmpty = lastEmpty + 1
                             break;
-                        case '#':
+                        case false:
                             lastEmpty = x + 1
                             break;
                     }
@@ -113,14 +154,14 @@
                 let lastEmpty = lines[0].length - 1
                 for (let x = lines[0].length - 1; x >= 0; x--) {
                     switch (lines[y][x]) {
-                        case 'O':
+                        case true:
                             if (lastEmpty !== x) {
-                                lines[y][x] = ' '
-                                lines[y][lastEmpty] = 'O'
+                                lines[y][x] = null
+                                lines[y][lastEmpty] = true
                             }
                             lastEmpty = lastEmpty - 1
                             break;
-                        case '#':
+                        case false:
                             lastEmpty = x - 1
                             break;
                     }

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advent Of Code</title>
+    <style> body { background-color: rgb(28, 28, 28); } </style>
+</head>
+
+<body>
+    <script type="module">
+        const dayId = window.location.pathname.split("/").pop().split(".").shift();
+        const fileUrl = `txt/${dayId}.txt`
+        document.querySelector('title').textContent = `AoC - ${dayId}`
+        const rawFile = await fetch(fileUrl)
+        const fileContent = await rawFile.text()
+        const steps = fileContent.split(',')
+
+        // const sum = steps.reduce((acc, step) => {
+        //     return acc + hash(step)
+        // }, 0)
+
+        // console.log(sum);
+
+        function hash(str) {
+            let hash = 0;
+            for(let i = 0; i < str.length; i++) {
+                hash += str.charCodeAt(i)
+                hash *= 17
+                hash %= 256
+            }
+            return hash;
+        }
+
+        const boxes = []
+
+        for(const step of steps) {
+            console.log(step);
+            if(step.indexOf('-') !== -1) {
+                const label = step.substring(0, step.indexOf('-'))
+                const box = hash(label)
+                if(!boxes[box]) continue;
+
+                const a = boxes[box].findIndex(box => box.label === label)
+                if(a === -1) continue
+                boxes[box].splice(a, 1)
+                
+            } else {
+                const [label, focal] = step.split('=')
+                const box = hash(label)
+                if(!boxes[box]) {
+                    boxes[box] = [{label: label, focal: parseInt(focal)}]
+                    continue
+                }
+
+                const a = boxes[box].findIndex(box => box.label === label)
+                if(a === -1)
+                    boxes[box].push({label: label, focal: parseInt(focal)})
+                else
+                    boxes[box][a].focal = parseInt(focal)
+            }
+        }
+
+        console.log(boxes);
+
+        const sum = boxes.reduce((acc, box, idx) => {
+            if(box) {
+                for(let i = 0; i < box.length; i++) {
+                    acc += (idx+1) * (i+1) * box[i].focal
+                }
+            }
+            return acc
+        }, 0)
+
+        console.log(sum);
+
+        
+    </script>
+</body>
+
+</html>

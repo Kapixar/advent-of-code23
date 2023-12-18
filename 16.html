@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advent Of Code</title>
+    <style>
+        body {
+            background-color: rgb(28, 28, 28);
+        }
+
+        canvas {
+            border: 1px solid red;
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="module">
+        const dayId = window.location.pathname.split("/").pop().split(".").shift();
+        const fileUrl = `txt/${dayId}.txt`
+        document.querySelector('title').textContent = `AoC - ${dayId}`
+        const rawFile = await fetch(fileUrl)
+        const fileContent = await rawFile.text()
+        const mirrors = fileContent.split('\r\n')
+        //split to array of arrays
+        mirrors.forEach((row, index) => {
+            mirrors[index] = row.split('')
+        })
+
+        // canvas with ctx
+        const canvas = document.createElement('canvas')
+        canvas.width = 1100
+
+        canvas.height = 1100
+        document.body.appendChild(canvas)
+        const ctx = canvas.getContext('2d')
+        ctx.fillStyle = 'white'
+        ctx.font = '13px monospace'
+
+        const dict = {
+            '-': {
+                '-1,0': ['1,0'],
+                '1,0': ['-1,0'],
+                '0,-1': ['1,0', '-1,0'],
+                '0,1': ['1,0', '-1,0']
+            },
+            '|': {
+                '-1,0': ['0,1', '0,-1'],
+                '1,0': ['0,1', '0,-1'],
+                '0,-1': ['0,1'],
+                '0,1': ['0,-1']
+            },
+            '/': {
+                '-1,0': ['0,-1'],
+                '1,0': ['0,1'],
+                '0,-1': ['-1,0'],
+                '0,1': ['1,0']
+            },
+            '\\': {
+                '-1,0': ['0,1'],
+                '1,0': ['0,-1'], // good
+                '0,-1': ['1,0'],
+                '0,1': ['-1,0']
+            },
+            '.': {
+                '-1,0': ['1,0'],
+                '1,0': ['-1,0'],
+                '0,-1': ['0,1'],
+                '0,1': ['0,-1']
+            },
+        }
+
+
+        let maxEnergized = 0
+
+        for(let edgeY = -1; edgeY <= mirrors.length; edgeY++) {
+            for(let edgeX = -1; edgeX <= 110; edgeX++) {
+                if(edgeY === -1 && edgeX === -1) continue;
+                if(edgeY === -1 && edgeX === 110) continue;
+                if(edgeY === mirrors.length && edgeX === -1) continue;
+                if(edgeY === mirrors.length && edgeX === 110) continue;
+                if(edgeY === -1 || edgeY === mirrors.length || edgeX === -1 || edgeX === mirrors[edgeY].length) {
+                    // console.log(edgeX, edgeY);
+                    const xDir = edgeX === -1 ? 1 : (edgeX === 110 ? -1 : 0)
+                    const yDir = edgeY === -1 ? 1 : (edgeY === mirrors.length ? -1 : 0)
+                    
+                    // console.log([edgeX, edgeY, xDir, yDir]);
+                    const energy = calculateEnergy([edgeX, edgeY, xDir, yDir])
+                    if(energy > maxEnergized) {
+                        maxEnergized = energy
+                    }
+                }
+            }
+        }
+
+        console.log(maxEnergized);
+
+        function calculateEnergy(startingBeam) {
+            const history = []
+            const coordHistory = []
+
+            let beams = [startingBeam]
+            let safe = 10000
+            while (beams.length > 0 && safe > 0) {
+                // console.log('new round');
+                const newBeams = []
+                for (let b = 0; b < beams.length; b++) {
+                    const [x, y, dx, dy] = beams[b]
+                    const nextX = x + dx
+                    const nextY = y + dy
+                    const entranceX = -dx
+                    const entranceY = -dy
+                    // console.log(nextX, nextY, entranceX, entranceY);
+                    if (mirrors[nextY] === undefined || mirrors[nextY][nextX] === undefined)
+                        continue;
+                    // console.log(mirrors[nextY][nextX]);
+                    const nextSymbol = mirrors[nextY][nextX]
+                    dict[nextSymbol][`${entranceX},${entranceY}`].forEach((direction) => {
+                        // console.log('for each', direction);
+                        const [newDx, newDy] = direction.split(',').map(Number)
+                        const newBeam = [nextX, nextY, newDx, newDy]
+                        const beamStr = beamToString(newBeam)
+                        if (history.includes(beamStr))
+                            return;
+                        // ctx.fillStyle = 'white'
+                        // ctx.fillRect(nextX*10, nextY*10, 10, 10)
+                        // ctx.fillStyle = 'red'
+                        // ctx.fillText(nextSymbol, nextX*10, nextY*10 + 10)
+                        newBeams.push(newBeam)
+                        history.push(beamStr)
+                        coordHistory.push(`${nextX},${nextY}`)
+                    })
+                }
+                // console.log(newBeams);
+                beams = newBeams;
+                safe--;
+            }
+            const unique = [...new Set(coordHistory)]
+    
+            // console.log(unique.length);
+            
+            return unique.length
+        }
+
+
+        function beamToString(beam) {
+            return `${beam[0]},${beam[1]},${beam[2]},${beam[3]}`
+        }
+
+    </script>
+</body>
+
+</html>

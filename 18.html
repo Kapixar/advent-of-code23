@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advent Of Code</title>
+    <style>
+        body {
+            background-color: rgb(28, 28, 28);
+        }
+
+        canvas {
+            border: 1px solid red;
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="module">
+        const dayId = window.location.pathname.split("/").pop().split(".").shift();
+        const fileUrl = `txt/${dayId}.txt`
+        document.querySelector('title').textContent = `AoC - ${dayId}`
+        const rawFile = await fetch(fileUrl)
+        const fileContent = await rawFile.text()
+        const lines = fileContent.split('\r\n')
+
+        // canvas with ctx
+        const canvas = document.createElement('canvas')
+        canvas.width = 300000
+        canvas.height = 300000
+
+        document.body.appendChild(canvas)
+        const ctx = canvas.getContext('2d')
+        ctx.fillStyle = 'white'
+        ctx.strokeStyle = 'white'
+        ctx.lineWidth = 1
+
+        let x = canvas.width/2
+        let y = canvas.width/2
+        // ctx.beginPath(); // Start a new path
+        // ctx.moveTo(5, 5);
+
+        for(const line of lines) {
+            const [falseDirection, lengthStr, hex] = line.split(' ')
+            const direction = parseInt(hex[7])
+            const length = parseInt(hex.slice(2, 7), 16)
+            console.log(direction, length);
+            let oldX = x
+            let oldY = y
+            switch(direction) {
+                case 0:
+                    oldX += length
+                    break
+                case 3:
+                    oldY -= length
+                    break
+                case 1:
+                    oldY += length
+                    break
+                case 2:
+                    oldX -= length
+                    break
+            }
+            while(oldX !== x || oldY !== y) {
+                ctx.fillRect(x, y, 1, 1)
+                switch(direction) {
+                    case 0:
+                        x++
+                        break
+                    case 3:
+                        y--
+                        break
+                    case 1:
+                        y++
+                        break
+                    case 2:
+                        x--
+                        break
+                }
+            }
+
+            
+            // ctx.lineTo(x+0.5+5, y+0.5+5)
+        }
+        // ctx.stroke()
+
+        
+    </script>
+</body>
+
+</html>
